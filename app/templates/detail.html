@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}INC-{{ "%04d"|format(incident.id) }}{% endblock %}
+{% block content %}
+<div class="crumb"><a href="/">← Dashboard</a><span>/</span> INC-{{ "%04d"|format(incident.id) }}</div>
+<section class="detail-hero"><div><p class="eyebrow">INCIDENT / {{ "%04d"|format(incident.id) }}</p><h1>{{ incident.title }}</h1><p class="muted">Reported by {{ incident.requester }} · {{ incident.created_at|utc }}</p></div><span class="status {{ incident.status|lower|replace(' ', '-') }}">{{ incident.status }}</span></section>
+{% if saved %}<div class="alert success" role="status">Changes saved.</div>{% endif %}
+<div class="detail-grid">
+  <section class="panel"><div class="panel-head"><h2>Incident details</h2><span class="priority {{ incident.priority|lower }}">{{ incident.priority }} priority</span></div>
+    <p class="description">{{ incident.description }}</p>
+    <div class="detail-meta"><div><small>Category</small><strong>{{ incident.category }}</strong></div><div><small>Assignee</small><strong>{{ incident.assignee }}</strong></div><div><small>Last updated</small><strong>{{ incident.updated_at|utc }}</strong></div></div>
+    {% if incident.resolved_at %}<p class="muted">Resolved at {{ incident.resolved_at|utc }}</p>{% endif %}
+    {% if incident.resolution_note %}<div class="resolution"><strong>Resolution / investigation note</strong><p>{{ incident.resolution_note }}</p></div>{% endif %}
+  </section>
+  <section class="panel"><h2>Update incident</h2><p class="muted">Changes are recorded in the audit history below.</p>
+    {% if errors %}<div class="alert error" role="alert"><strong>Please fix the following:</strong><ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+    <form class="edit-form" action="/incidents/{{ incident.id }}/update" method="post">
+      <label>Status<select name="status">{% for x in statuses %}<option {% if form.status == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label>
+      <label>Priority<select name="priority">{% for x in priorities %}<option {% if form.priority == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label>
+      <label>Assignee<input name="assignee" value="{{ form.assignee }}" maxlength="{{ limits.MAX_NAME }}"></label>
+      <label>Resolution / investigation note<textarea name="resolution_note" rows="3" maxlength="{{ limits.MAX_NOTE }}">{{ form.resolution_note }}</textarea></label>
+      <label>Changed by<input name="changed_by" value="{{ form.changed_by }}" maxlength="{{ limits.MAX_NAME }}"></label>
+      <button class="button primary" type="submit">Save changes</button>
+    </form>
+  </section>
+</div>
+<section class="panel history-panel"><div class="panel-head"><h2>Change history</h2><span class="pill">{{ history|length }} events</span></div>
+  {% if history %}<div class="history-list">{% for event in history %}<div class="history-item"><span class="history-dot"></span><div><strong>{{ event.field_name|replace('_',' ')|title }}</strong><p>{% if event.old_value %}<span>{{ event.old_value }}</span> → {% endif %}<span>{{ event.new_value }}</span></p><small>{{ event.changed_by }} · {{ event.changed_at|utc }}</small></div></div>{% endfor %}</div>
+  {% else %}<p class="muted">No changes recorded yet.</p>{% endif %}
+</section>
+{% endblock %}

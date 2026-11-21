@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}New incident{% endblock %}
+{% block content %}
+<div class="crumb"><a href="/">← Dashboard</a></div>
+<section class="form-layout"><div><p class="eyebrow">SERVICE DESK / INTAKE</p><h1>Report an incident</h1><p class="muted">Capture enough detail for the support team to triage and investigate.</p><div class="tip"><strong>Good ticket tip</strong><p>Describe what happened, what you expected, and when the issue started. Never include passwords, access tokens or sensitive personal data.</p></div></div>
+<form class="panel form-card" action="/incidents" method="post">
+  {% if errors %}<div class="alert error" role="alert"><strong>Please fix the following:</strong><ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+  <label>Incident title <span aria-hidden="true">*</span><input name="title" required maxlength="{{ limits.MAX_TITLE }}" value="{{ form.title or '' }}" placeholder="e.g. VPN disconnects repeatedly"></label>
+  <label>Description <span aria-hidden="true">*</span><textarea name="description" required maxlength="{{ limits.MAX_DESCRIPTION }}" rows="5" placeholder="What happened? What have you tried?">{{ form.description or '' }}</textarea></label>
+  <label>Requester name <span aria-hidden="true">*</span><input name="requester" required maxlength="{{ limits.MAX_NAME }}" value="{{ form.requester or '' }}" placeholder="Employee name"></label>
+  <div class="two-col"><label>Category<select name="category" required>{% for x in categories %}<option {% if form.category == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label><label>Priority<select name="priority" required>{% for x in priorities %}<option {% if form.priority == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label></div>
+  <label>Assignee<input name="assignee" maxlength="{{ limits.MAX_NAME }}" placeholder="Unassigned" value="{{ form.assignee or 'Unassigned' }}"></label>
+  <div class="form-actions"><a class="button secondary" href="/">Cancel</a><button class="button primary" type="submit">Create incident</button></div>
+</form></section>
+{% endblock %}

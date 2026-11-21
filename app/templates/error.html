@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Error {{ status_code }}{% endblock %}
+{% block content %}
+<section class="panel error-panel">
+  <p class="eyebrow">ERROR {{ status_code }}</p>
+  <h1>{% if status_code == 404 %}Not found{% elif status_code == 503 %}Service unavailable{% else %}Something went wrong{% endif %}</h1>
+  <p class="muted">{{ message }}</p>
+  <p><a class="button primary" href="/">Back to the dashboard</a></p>
+</section>
+{% endblock %}

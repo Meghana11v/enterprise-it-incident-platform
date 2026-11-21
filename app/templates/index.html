@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Operations dashboard{% endblock %}
+{% block content %}
+<section class="hero">
+  <div><p class="eyebrow">SERVICE OPERATIONS / OVERVIEW</p><h1>Incident intelligence</h1><p class="muted">Track service issues, prioritize response, and understand operational trends.</p></div>
+  <a class="button primary" href="/incidents/new">＋ Create incident</a>
+</section>
+<section class="metric-grid" aria-label="Key metrics">
+  <article class="metric"><span>Total incidents</span><strong>{{ metrics.total }}</strong><small>All recorded tickets</small></article>
+  <article class="metric"><span>Active backlog</span><strong>{{ metrics.open }}</strong><small>Open, in progress or waiting</small></article>
+  <article class="metric"><span>Critical active</span><strong class="{% if metrics.critical %}danger-text{% endif %}">{{ metrics.critical }}</strong><small>Critical priority, not yet resolved</small></article>
+  <article class="metric"><span>Resolved / closed</span><strong>{{ metrics.resolved }}</strong><small>{% if metrics.avg_resolution_hours is not none %}Average time to resolve: {{ metrics.avg_resolution_hours }}h{% else %}No completed incidents yet{% endif %}</small></article>
+</section>
+<section class="insight-grid">
+  <article class="panel"><div class="panel-head"><h2>Incidents by category</h2><span class="pill">All incidents</span></div>
+    {% set max_cat = category_rows[0][1] if category_rows else 0 %}
+    {% for name, count in category_rows %}
+    <div class="bar-row"><div><span>{{ name }}</span><b>{{ count }}</b></div><div class="bar-track"><span style="width: {{ ((count / max_cat * 100) if max_cat else 0)|round(1) }}%"></span></div></div>
+    {% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </article>
+  <article class="panel"><div class="panel-head"><h2>Priority distribution</h2><span class="pill">All incidents</span></div>
+    {% set max_pr = priority_rows|map('last')|max if priority_rows else 0 %}
+    {% for name, count in priority_rows %}
+    <div class="bar-row"><div><span><i class="priority-dot {{ name|lower }}"></i>{{ name }}</span><b>{{ count }}</b></div><div class="bar-track"><span class="{{ name|lower }}" style="width: {{ ((count / max_pr * 100) if max_pr else 0)|round(1) }}%"></span></div></div>
+    {% else %}<p class="muted">No data yet.</p>{% endfor %}
+  </article>
+</section>
+<section class="panel incidents-panel">
+  <div class="panel-head"><div><h2>Incident queue</h2><p class="muted">Search, filter and open a ticket to manage its lifecycle.</p></div><span class="pill" role="status">{{ incidents|length }} shown</span></div>
+  <form class="filters" method="get" action="/" role="search">
+    <label class="sr-only" for="f-q">Search incidents</label>
+    <input id="f-q" type="search" name="q" value="{{ q }}" maxlength="100" placeholder="Search tickets, people, descriptions…">
+    <label class="sr-only" for="f-status">Filter by status</label>
+    <select id="f-status" name="status"><option value="All">All statuses</option>{% for x in statuses %}<option {% if selected_status == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select>
+    <label class="sr-only" for="f-priority">Filter by priority</label>
+    <select id="f-priority" name="priority"><option value="All">All priorities</option>{% for x in priorities %}<option {% if selected_priority == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select>
+    <label class="sr-only" for="f-category">Filter by category</label>
+    <select id="f-category" name="category"><option value="All">All categories</option>{% for x in categories %}<option {% if selected_category == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select>
+    <button class="button secondary" type="submit">Filter</button>
+  </form>
+  <div class="table-wrap"><table><caption class="sr-only">Incidents, most urgent first</caption><thead><tr><th scope="col">ID / incident</th><th scope="col">Category</th><th scope="col">Priority</th><th scope="col">Status</th><th scope="col">Assignee</th><th scope="col">Updated</th></tr></thead><tbody>
+  {% for item in incidents %}
+    <tr><td><a class="ticket-link" href="/incidents/{{ item.id }}">INC-{{ "%04d"|format(item.id) }} · {{ item.title }}</a><small class="cell-sub">{{ item.requester }}</small></td><td>{{ item.category }}</td><td><span class="priority {{ item.priority|lower }}">{{ item.priority }}</span></td><td><span class="status {{ item.status|lower|replace(' ', '-') }}">{{ item.status }}</span></td><td>{{ item.assignee }}</td><td>{{ item.updated_at|utc }}</td></tr>
+  {% else %}<tr><td colspan="6" class="empty">{% if filters_active %}No incidents match these filters. <a href="/">Clear filters</a>{% else %}No incidents yet. <a href="/incidents/new">Create the first one</a>.{% endif %}</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

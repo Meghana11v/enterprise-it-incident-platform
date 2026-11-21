@@ -1,0 +1,21 @@
+# Render Blueprint: one Python web service + one persistent disk for SQLite.
+# Persistent disks are NOT available on Render's free plan, so a paid plan
+# (starter or higher) is required. Check current pricing before deploying.
+services:
+  - type: web
+    name: opsdesk-incident-platform
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    # Render provides $PORT; the app must listen on 0.0.0.0:$PORT.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION   # must be a fully qualified version
+        value: 3.12.7
+      - key: DB_PATH          # must live under the disk mountPath below
+        value: /var/data/incidents.db
+    disk:
+      name: opsdesk-data
+      mountPath: /var/data
+      sizeGB: 1

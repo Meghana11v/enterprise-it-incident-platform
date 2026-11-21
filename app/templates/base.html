@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}OpsDesk{% endblock %} · OpsDesk</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="topbar">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">O</span><span>OpsDesk<small>IT INCIDENT INTELLIGENCE</small></span></a>
+    <nav aria-label="Main"><a href="/">Dashboard</a><a class="nav-cta" href="/incidents/new">＋ New incident</a></nav>
+  </header>
+  <main class="page" id="main">{% block content %}{% endblock %}</main>
+  <footer>OpsDesk portfolio project · Uses fictional demo data · Not for production incident management · Times shown in UTC</footer>
+</body>
+</html>

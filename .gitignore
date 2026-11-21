@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+.env.*
+.DS_Store
+# Local SQLite databases (including WAL/journal side files) must never be committed
+data/*.db
+data/*.db-*
+*.db
+*.sqlite3
