@@ -1,7 +1,7 @@
 # Audit and change log (v1.0 → v1.1)
 
 ## How this was verified
-Sandbox had **no network**, so FastAPI, pytest, httpx and Docker could not be installed or run.
+The first checks below ran in a sandbox with **no network** (FastAPI, pytest, httpx and Docker could not be installed there). The rest were then verified in GitHub Actions, where noted.
 
 | Check | Status |
 |---|---|
@@ -11,9 +11,10 @@ Sandbox had **no network**, so FastAPI, pytest, httpx and Docker could not be in
 | `python -m app.db init/reset` CLI | Run: pass |
 | `render.yaml` and `ci.yml` parse as YAML; `DB_PATH` is inside the disk mount; start command uses `0.0.0.0` and `$PORT` | Run: pass |
 | Render fields (`disk`, `plan`, `PYTHON_VERSION`, `PORT`) | Checked against Render's public docs |
-| `tests/test_app.py` (route + API tests) and `pytest -q` | **NOT RUN** |
-| FastAPI app start-up, security-header middleware, exception handlers | **NOT RUN** |
-| Docker build/start, CI run, Render deployment | **NOT RUN** |
+| `tests/test_app.py` (route + API tests) and `pytest -q` | Verified in GitHub Actions run #1 (Python 3.11 and 3.12) |
+| FastAPI app start-up, security-header middleware, exception handlers | Verified in GitHub Actions run #1 (exercised by the route tests) |
+| Docker image builds and `/api/health` responds | Verified in GitHub Actions run #1 |
+| Render deployment | **NOT RUN** |
 
 ## Findings in v1.0 and what was done
 | # | Finding | Severity | Fix |
